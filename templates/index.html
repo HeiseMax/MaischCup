@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fencing Score Sheet</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f9;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        text-align: center;
+        padding: 5px;
+        width: 65px;
+        height: 65px;
+      }
+      th {
+        background-color: #2a3d45;
+        color: white;
+      }
+      .dark-cell {
+        background-color: #333;
+        color: white;
+      }
+      .win {
+        background-color: #a8e6a3;
+      }
+      .loss {
+        background-color: #e6a3a3;
+      }
+      .result-form {
+        margin-top: 20px;
+        text-align: center;
+      }
+      .result-form select,
+      .result-form input {
+        margin: 5px;
+        padding: 5px;
+      }
+      .add-player-form {
+        margin-top: 20px;
+        text-align: center;
+      }
+      .add-player-form input {
+        margin: 5px;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Maisch Cup</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Nummer</th>
+            {% for player in players %}
+            <th title="{{ player.name }}">{{ loop.index }}</th>
+            {% endfor %}
+            <th>Gewonnen</th>
+            <th>Verloren</th>
+            <th>Offen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for player in players %}
+          <tr>
+            <!-- Player Details -->
+            <td>{{ player.name }}</td>
+            <td>{{ loop.index }}</td>
+
+            <!-- Matchup Results -->
+            {% for opponent in players %}
+            <!-- Black cell for same player -->
+            {% if player.id == opponent.id %}
+            <td class="dark-cell">---</td>
+
+            {% else %} {% set score = scores|selectattr('player1_id', 'equalto',
+            player.id)|selectattr('player2_id', 'equalto', opponent.id)|first%}
+            <td
+              class="{% if score %} {% if score.win %}win{% else %}loss{% endif %}{% endif %}"
+            >
+              {% if score %} {% if score.win %} V{{ score.score1 }}
+              <br />-<br />
+              D{{score.score2 }} {% else %} D{{ score.score1 }} <br />-<br />
+              V{{ score.score2}} {% endif %} {% else %} - {% endif %}
+            </td>
+            {% endif %} {% endfor %}
+            <td>{{ won_matches[player.id] }}</td>
+            <td>{{ lost_matches[player.id] }}</td>
+            <td>{{ remaining_matches[player.id] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="result-form">
+        <h2>Submit Match Result</h2>
+        <form method="POST" action="/update_score">
+          <label for="player1_id">Player 1:</label>
+          <select name="player1_id" id="player1_id">
+            {% for player in players %}
+            <option value="{{ player.id }}" {% if session.get('player_id') == player.id %}selected{% endif %}>{{ player.name }}</option>
+            {% endfor %}
+          </select>
+          <label for="player2_id">Player 2:</label>
+          <select name="player2_id" id="player2_id">
+            {% for player in players %}
+            <option value="{{ player.id }}">{{ player.name }}</option>
+            {% endfor %}
+          </select>
+          <label for="score1">Player 1 Score:</label>
+          <input type="number" name="score1" id="score1" min="0" max="5" />
+          <label for="score2">Player 2 Score:</label>
+          <input type="number" name="score2" id="score2" min="0" max="5" />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+      <div class="add-player-form">
+        <h2>Add New Player</h2>
+        <form method="GET" action="/add_player">
+          <button type="submit">Teilnehmer hinzufügen</button>
+        </form>
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <ul>
+          {% for message in messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}
+      </div>
+    </div>
+  </body>
+</html>
