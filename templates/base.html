@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Fencing Score Sheet{% endblock %}</title>
+    <style>
+      body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 20px;
+          background-color: #f4f4f9;
+      }
+      .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background-color: #fff;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
+      h1 {
+          text-align: center;
+      }
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+      }
+      th, td {
+          border: 1px solid #ddd;
+          text-align: center;
+          padding: 5px;
+          width: 65px;
+          height: 65px;
+      }
+      th {
+          background-color: #2a3d45;
+          color: white;
+      }
+      .dark-cell {
+          background-color: #333;
+          color: white;
+      }
+      .result-form {
+          margin-top: 20px;
+          text-align: center;
+      }
+      .result-form select, .result-form input {
+          margin: 5px;
+          padding: 5px;
+      }
+      .add-player-form {
+          margin-top: 20px;
+          text-align: center;
+      }
+      .add-player-form input {
+          margin: 5px;
+          padding: 5px;
+      }
+    </style>
+    {% block styles %}{% endblock %}
+  </head>
+  <body>
+    <h1>Maisch Cup</h1>
+    <div class="container">{% block content %}{% endblock %}</div>
+  </body>
+</html>
