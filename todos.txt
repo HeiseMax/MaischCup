@@ -1,0 +1,24 @@
+TODOS:
+maintainability:
+html aufsplitten
+nummerierung und playerID consistant machen/löschen
+
+
+add dev section:
+leute löschen
+gefechte löschen
+sessionplayeerid setzen
+auto sessionid on/off
+
+
+usability:
+in match submission auswahl spieler die man schon hat ausgrauen
+index zahlen in mehreren reihen anzueigen
+highlight row/column on click
+design
+
+
+future features:
+verbleibende matches page
+Turnierkonfiguration (name der datenbank, neues Turnier, etc.)
+extract results

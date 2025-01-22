@@ -22,34 +22,6 @@
       h1 {
           text-align: center;
       }
-      table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 20px;
-      }
-      th, td {
-          border: 1px solid #ddd;
-          text-align: center;
-          padding: 5px;
-          width: 65px;
-          height: 65px;
-      }
-      th {
-          background-color: #2a3d45;
-          color: white;
-      }
-      .dark-cell {
-          background-color: #333;
-          color: white;
-      }
-      .result-form {
-          margin-top: 20px;
-          text-align: center;
-      }
-      .result-form select, .result-form input {
-          margin: 5px;
-          padding: 5px;
-      }
       .add-player-form {
           margin-top: 20px;
           text-align: center;
@@ -62,6 +34,8 @@
     {% block styles %}{% endblock %}
   </head>
   <body>
+    <img src="{{ url_for('static', filename='images/maisch.png') }}" alt="Maisch Logo" style="display: block; margin: 0 auto; height: 100px;">
+    <img src="{{ url_for('static', filename='images/tsg.png') }}" alt="TSG Rohrbach Logo" style="display: block; margin: 0 auto; height: 100px;">
     <h1>Maisch Cup</h1>
     <div class="container">{% block content %}{% endblock %}</div>
   </body>

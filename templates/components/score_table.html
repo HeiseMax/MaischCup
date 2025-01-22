@@ -1,0 +1,75 @@
+{% block styles %}
+<style>
+  table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+  }
+  th, td {
+      border: 1px solid #ddd;
+      text-align: center;
+      padding: 5px;
+      width: 65px;
+      height: 65px;
+  }
+  th {
+      background-color: #2a3d45;
+      color: white;
+  }
+  .dark-cell {
+      background-color: #333;
+      color: white;
+  }
+  .win {
+      background-color: #a8e6a3;
+  }
+  .loss {
+      background-color: #e6a3a3;
+  }
+</style>
+{% endblock %}
+
+<html>
+    <table>
+    <thead>
+        <tr>
+        <th>Name</th>
+        <th>Nummer</th>
+        {% for player in players %}
+        <th title="{{ player.name }}">{{ loop.index }}</th>
+        {% endfor %}
+        <th>Gewonnen</th>
+        <th>Verloren</th>
+        <th>Offen</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in players %}
+        <tr>
+        <!-- Player Details -->
+        <td>{{ player.name }}</td>
+        <td>{{ loop.index }}</td>
+
+        <!-- Matchup Results -->
+        {% for opponent in players %}
+        <!-- Black cell for same player -->
+        {% if player.id == opponent.id %}
+        <td class="dark-cell">---</td>
+        {% else %} {% set score = scores|selectattr('player1_id', 'equalto',
+        player.id)|selectattr('player2_id', 'equalto', opponent.id)|first %}
+        <td
+            class="{% if score %} {% if score.win %}win{% else %}loss{% endif %}{% endif %}"
+        >
+            {% if score %} {% if score.win %} V{{ score.score1 }}<br />-<br />D{{
+            score.score2 }} {% else %} D{{ score.score1 }}<br />-<br />V{{
+            score.score2 }} {% endif %} {% else %} - {% endif %}
+        </td>
+        {% endif %} {% endfor %}
+        <td>{{ won_matches[player.id] }}</td>
+        <td>{{ lost_matches[player.id] }}</td>
+        <td>{{ remaining_matches[player.id] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+</html>

@@ -62,6 +62,7 @@ def add_player():
     if request.method == 'POST':
         new_name = request.form['name']
         if Player.query.filter_by(name=new_name).first():
+            session['player_id'] = Player.query.filter_by(name=new_name).first().id
             flash('Name already used. Please choose a different name.')
         else:
             new_player = Player(name=new_name)
@@ -72,29 +73,40 @@ def add_player():
         return redirect(url_for('add_player'))
 
 # Route to handle score updates
-@app.route('/update_score', methods=['POST'])
+@app.route('/update_score', methods=['GET', 'POST'])
 def update_score():
-    player1_id = int(request.form['player1_id'])
-    player2_id = int(request.form['player2_id'])
-    score1 = int(request.form['score1'])
-    score2 = int(request.form['score2'])
+    if request.method == 'GET':
+        players = Player.query.all()
+        scores = Score.query.all()
+        return render_template('update_score.html', players=players, scores=scores)
     
-    # Update the score between player1 and player2
-    if player1_id != player2_id:
-        win = score1 > score2
-        score = Score.query.filter_by(player1_id=player1_id, player2_id=player2_id).first()
-        if score:
-            score.score1 = score1
-            score.score2 = score2
-            score.win = win
-        else:
-            new_score = Score(player1_id=player1_id, player2_id=player2_id, score1=score1, score2=score2, win=win)
-            new_score_rev = Score(player1_id=player2_id, player2_id=player1_id, score1=score2, score2=score1, win=not win)
-            db.session.add(new_score)
-            db.session.add(new_score_rev)
-        db.session.commit()
-    
-    return redirect(url_for('index'))
+    if request.method == 'POST':
+        player1_id = int(request.form['player1_id'])
+        player2_id = int(request.form['player2_id'])
+        score1 = int(request.form['score1'])
+        score2 = int(request.form['score2'])
+        
+        # Validate scores
+        if player1_id != player2_id and isinstance(score1, int) and isinstance(score2, int):
+            if (score1 == 5 or score2 == 5) and not (score1 == 5 and score2 == 5):
+                # Update the score between player1 and player2
+                if player1_id != player2_id:
+                    win = score1 > score2
+                    score = Score.query.filter_by(player1_id=player1_id, player2_id=player2_id).first()
+                    if score:
+                        score.score1 = score1
+                        score.score2 = score2
+                        score.win = win
+                    else:
+                        new_score = Score(player1_id=player1_id, player2_id=player2_id, score1=score1, score2=score2, win=win)
+                        new_score_rev = Score(player1_id=player2_id, player2_id=player1_id, score1=score2, score2=score1, win=not win)
+                        db.session.add(new_score)
+                        db.session.add(new_score_rev)
+                    db.session.commit()
+                return redirect(url_for('index'))
+        
+        flash('Invalid score submission. One of the scores must be 5 and not both.')
+        return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
