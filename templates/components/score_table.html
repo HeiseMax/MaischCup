@@ -62,6 +62,7 @@
         player.id)|selectattr('player2_id', 'equalto', opponent.id)|first %}
         <td
             class="{% if score %} {% if score.win %}win{% else %}loss{% endif %}{% endif %}"
+            title="{{ opponent.name }}"
         >
             {% if score %} {% if score.win %} V{{ score.score1 }}<br />-<br />D{{
             score.score2 }} {% else %} D{{ score.score1 }}<br />-<br />V{{
