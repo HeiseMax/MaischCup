@@ -4,7 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Fencing Score Sheet{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="../static/images/tsg.png">
     <style>
+      header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 20px;
+      }
+      header h1 {
+          grid-column: 2;
+      }
       body {
           font-family: Arial, sans-serif;
           margin: 0;
@@ -34,9 +45,11 @@
     {% block styles %}{% endblock %}
   </head>
   <body>
-    <img src="{{ url_for('static', filename='images/maisch.png') }}" alt="Maisch Logo" style="display: block; margin: 0 auto; height: 100px;">
-    <img src="{{ url_for('static', filename='images/tsg.png') }}" alt="TSG Rohrbach Logo" style="display: block; margin: 0 auto; height: 100px;">
-    <h1>Maisch Cup</h1>
+    <header>
+      <img src="{{ url_for('static', filename='images/maisch.png') }}" alt="Maisch Logo" style="display: block; margin: 0 auto; height: 100px;">
+      <h1>Maisch Cup</h1>
+      <img src="{{ url_for('static', filename='images/tsg.png') }}" alt="TSG Rohrbach Logo" style="display: block; margin: 0 auto; height: 100px;">
+    </header>
     <div class="container">{% block content %}{% endblock %}</div>
   </body>
 </html>

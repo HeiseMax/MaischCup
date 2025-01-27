@@ -1,10 +1,21 @@
 {% extends "base.html" %}
 
+{% block styles %}
+<style>
+  .container {
+      font-size: larger;
+  }
+  button {
+      font-size: large;
+  }
+  li{list-style:none;}
+</style>
+{% endblock %}
+
 {% block title %}Fencing Score Sheet{% endblock %}
 
 {% block content %}
 <html>
-  <body>
     <div class="container">
       <div class="add-player-form">
         <h2>Teilnehmer hinzufügen</h2>
@@ -25,6 +36,5 @@
         </form>
       </div>
     </div>
-  </body>
 </html>
 {% endblock %}

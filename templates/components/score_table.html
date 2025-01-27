@@ -26,6 +26,9 @@
   .loss {
       background-color: #e6a3a3;
   }
+  .even-row {
+            background-color: #2a3d4554;
+    }
 </style>
 {% endblock %}
 
@@ -45,7 +48,7 @@
     </thead>
     <tbody>
         {% for player in players %}
-        <tr>
+        <tr class="{% if loop.index is even %}even-row{% endif %}">
         <!-- Player Details -->
         <td>{{ player.name }}</td>
         <td>{{ loop.index }}</td>

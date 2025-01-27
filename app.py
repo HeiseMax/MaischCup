@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
+import json
 
 app = Flask(__name__)
 
@@ -51,7 +52,9 @@ def index():
     won_matches = {player.id: calculate_won_matches(player.id) for player in players}
     lost_matches = {player.id: calculate_lost_matches(player.id) for player in players}
     remaining_matches = {player.id: calculate_remaining_matches(player.id) for player in players}
-    return render_template('index.html', players=players, scores=scores, won_matches=won_matches, lost_matches=lost_matches, remaining_matches=remaining_matches)
+    playersjson = json.dumps([{"id": player.id, "name": player.name} for player in players])
+    scoresjson = json.dumps([{"player1_id": score.__dict__["player1_id"], "player2_id": score.__dict__["player2_id"]} for score in scores])
+    return render_template('index.html', players=players, scores=scores, won_matches=won_matches, lost_matches=lost_matches, remaining_matches=remaining_matches, playersjson=playersjson, scoresjson=scoresjson)
 
 # Route to handle adding a new player
 @app.route('/add_player', methods=['POST', 'GET'])
@@ -63,7 +66,7 @@ def add_player():
         new_name = request.form['name']
         if Player.query.filter_by(name=new_name).first():
             session['player_id'] = Player.query.filter_by(name=new_name).first().id
-            flash('Name already used. Please choose a different name.')
+            flash('Name schon eingetragen. Entweder du bist schon eingetragen, oder dein Namensvetter war schneller.')
         else:
             new_player = Player(name=new_name)
             db.session.add(new_player)
@@ -78,7 +81,9 @@ def update_score():
     if request.method == 'GET':
         players = Player.query.all()
         scores = Score.query.all()
-        return render_template('update_score.html', players=players, scores=scores)
+        playersjson = json.dumps([{"id": player.id, "name": player.name} for player in players])
+        scoresjson = json.dumps([{"player1_id": score.__dict__["player1_id"], "player2_id": score.__dict__["player2_id"]} for score in scores])
+        return render_template('update_score.html', players=players, scores=scores, playersjson=playersjson, scoresjson=scoresjson)
     
     if request.method == 'POST':
         player1_id = int(request.form['player1_id'])
@@ -105,7 +110,7 @@ def update_score():
                     db.session.commit()
                 return redirect(url_for('index'))
         
-        flash('Invalid score submission. One of the scores must be 5 and not both.')
+        flash('Ergebnis nicht zulässig. Einer der beiden Punktestände muss 5 sein.')
         return redirect(url_for('index'))
 
 if __name__ == '__main__':

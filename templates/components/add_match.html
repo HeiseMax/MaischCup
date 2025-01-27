@@ -3,45 +3,59 @@
     .result-form {
         margin-top: 20px;
         text-align: center;
+        font-size: larger;
     }
     .result-form select, .result-form input {
         margin: 5px;
         padding: 5px;
     }
+    li{list-style:none;}
+    .grayed-out {
+            color: rgba(128, 128, 128, 0.562);
+            background-color: rgba(128, 128, 128, 0.162);
+        }
 </style>
 {% endblock %}
 
 <html>
     <div class="result-form">
-        <h2>Submit Match Result</h2>
+        <h2>Ergebnis Eintragen</h2>
         <form method="POST" action="/update_score">
-            <label for="player1_id">Player 1:</label>
+            <label for="player1_id">Das Gefecht zwischen</label>
             <select name="player1_id" id="player1_id">
                 {% for player in players %}
-                <option value="{{ player.id }}" {% if session.get('player_id') == player.id %}selected{% endif %}>{{ player.name }}</option>
+                <option value="{{ player.id }}" {% if session.get('player_id') == player.id %}selected{% endif %}>{{ loop.index }}{{ ". " + player.name }}</option>
                 {% endfor %}
             </select>
-            <label for="player2_id">Player 2:</label>
+            <label for="player2_id">und</label>
             <select name="player2_id" id="player2_id">
                 {% for player in players %}
                 <option value="{{ player.id }}">{{ player.name }}</option>
                 {% endfor %}
             </select>
-            <label for="score1">Player 1 Score:</label>
+            <label for="score1">geht</label>
             <select name="score1" id="score1">
                 <option value="">-</option>
                 {% for i in range(6) %}
                 <option value="{{ i }}">{{ i }}</option>
                 {% endfor %}
             </select>
-            <label for="score2">Player 2 Score:</label>
+            <label for="score2">zu</label>
             <select name="score2" id="score2">
                 <option value="">-</option>
                 {% for i in range(6) %}
                 <option value="{{ i }}">{{ i }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" id="submit-button" disabled>Submit</button>
+            <label for="score2">aus.</label>
+            <button type="submit" id="submit-button" disabled>Eintragen!</button>
+            {% with messages = get_flashed_messages() %} {% if messages %}
+            <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+            {% endif %} {% endwith %}
         </form>
     </div>
 </html>
@@ -71,5 +85,39 @@
         player2Select.addEventListener('change', validateScores);
         score1Select.addEventListener('change', validateScores);
         score2Select.addEventListener('change', validateScores);
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const player1Select = document.getElementById('player1_id');
+        const player2Select = document.getElementById('player2_id');
+        const playersjson = JSON.parse('{{ playersjson | safe}}');     
+        const scoresjson = JSON.parse('{{ scoresjson | safe}}'); 
+        
+        
+        function updatePlayer2Options() {
+            const player1Id = parseInt(player1Select.value);
+            player2Select.innerHTML = '';
+
+            playersjson.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.id;
+                option.textContent = `${player.id}. ${player.name}`;
+
+                const existingScore = scoresjson.find(score => score.player1_id === player1Id && score.player2_id === player.id);
+                if (existingScore) {
+                    option.classList.add('grayed-out');
+                }
+                if (player1Id === player.id) {
+                    option.classList.add('grayed-out');
+                }
+
+                player2Select.appendChild(option);
+            });
+        }
+
+        player1Select.addEventListener('change', updatePlayer2Options);
+        updatePlayer2Options(); // Initial call to set options based on the default selection
     });
 </script>

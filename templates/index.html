@@ -1,27 +1,28 @@
 {% extends "base.html" %}
 
+{% block styles %}
+<style>
+  button {
+      font-size: larger;
+  }
+</style>
+{% endblock %}
+
 {% block title %}Fencing Score Sheet{% endblock %}
 
 {% block content %}
 <div class="container">
   <!-- Score Table -->
   {% include 'components/score_table.html' %}
-  <!-- Add Match Form -->
-  {% include 'components/add_match.html' %}
 
   <!-- Add Player Form -->
   <div class="add-player-form">
-    <h2>Add New Player</h2>
     <form method="GET" action="/add_player">
       <button type="submit">Teilnehmer hinzufügen</button>
     </form>
-    {% with messages = get_flashed_messages() %} {% if messages %}
-    <ul>
-      {% for message in messages %}
-      <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %} {% endwith %}
   </div>
+
+  <!-- Add Match Form -->
+  {% include 'components/add_match.html' %}  
 </div>
 {% endblock %}
