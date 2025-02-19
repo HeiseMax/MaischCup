@@ -1,7 +1,7 @@
 install requirements:
 pip install -r requirements.txt
 
-initialize the database:
+initialize a database (name in app.config):
 (python)
 from app import app
 from app import db

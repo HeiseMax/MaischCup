@@ -1,16 +1,8 @@
 TODOS:
 
-add dev section:
-leute löschen
-gefechte löschen
-sessionplayeerid setzen
-auto sessionid on/off
-
-
-usability:
-index zahlen in mehreren reihen anzueigen
-highlight row/column on click
-design
+increase tooltip font size
+increaase name selection font size
+mobile layout design
 
 
 future features:

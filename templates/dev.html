@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Developer Page{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Players</h2>
+    <ul>
+        {% for player in players %}
+        <li>
+            {{ player.name }}
+            <form method="POST" action="{{ url_for('remove_player', player_id=player.id) }}" style="display:inline;">
+                <button type="submit">Remove</button>
+            </form>
+            <form method="POST" action="{{ url_for('change_player_name', player_id=player.id) }}" style="display:inline;">
+                <input type="text" name="new_name" placeholder="New name" required>
+                <button type="submit">Change Name</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Matches</h2>
+    <ul>
+        {% for score in scores %}
+        <li>
+            {{ score.player1.name }} vs {{ score.player2.name }}: {{ score.score1 }} - {{ score.score2 }}
+            <form method="POST" action="{{ url_for('remove_match', player1_id=score.player1_id, player2_id=score.player2_id) }}" style="display:inline;">
+                <button type="submit">Remove Match</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

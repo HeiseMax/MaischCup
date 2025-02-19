@@ -90,6 +90,8 @@ def update_score():
         player2_id = int(request.form['player2_id'])
         score1 = int(request.form['score1'])
         score2 = int(request.form['score2'])
+
+        session['player_id'] = player1_id
         
         # Validate scores
         if player1_id != player2_id and isinstance(score1, int) and isinstance(score2, int):
@@ -112,6 +114,55 @@ def update_score():
         
         flash('Ergebnis nicht zulässig. Einer der beiden Punktestände muss 5 sein.')
         return redirect(url_for('index'))
+    
+@app.route('/dev', methods=['GET', 'POST'])
+def dev():
+    players = Player.query.all()
+    scores = Score.query.all()
+    return render_template('dev.html', players=players, scores=scores)
+    
+# Route to remove a player
+@app.route('/remove_player/<int:player_id>', methods=['POST'])
+def remove_player(player_id):
+    player = Player.query.get(player_id)
+    if player:
+        # Remove all scores involving this player
+        Score.query.filter((Score.player1_id == player_id) | (Score.player2_id == player_id)).delete()
+        db.session.delete(player)
+        db.session.commit()
+        flash('Player removed successfully.')
+    else:
+        flash('Player not found.')
+    return redirect(url_for('index'))
+
+# Route to change a player's name
+@app.route('/change_player_name/<int:player_id>', methods=['POST'])
+def change_player_name(player_id):
+    new_name = request.form['new_name']
+    player = Player.query.get(player_id)
+    if player:
+        player.name = new_name
+        db.session.commit()
+        flash('Player name updated successfully.')
+    else:
+        flash('Player not found.')
+    return redirect(url_for('index'))
+
+# Route to remove a match
+@app.route('/remove_match/<int:player1_id>/<int:player2_id>', methods=['POST'])
+def remove_match(player1_id, player2_id):
+    score = Score.query.filter_by(player1_id=player1_id, player2_id=player2_id).first()
+    if score:
+        db.session.delete(score)
+        # Also remove the reverse match
+        reverse_score = Score.query.filter_by(player1_id=player2_id, player2_id=player1_id).first()
+        if reverse_score:
+            db.session.delete(reverse_score)
+        db.session.commit()
+        flash('Match removed successfully.')
+    else:
+        flash('Match not found.')
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
