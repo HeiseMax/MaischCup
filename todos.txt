@@ -1,7 +1,6 @@
 TODOS:
 
-increase tooltip font size
-increaase name selection font size
+increase tooltip font size (needs custom css tooltip)
 mobile layout design
 
 
