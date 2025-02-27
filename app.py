@@ -6,7 +6,7 @@ import json
 app = Flask(__name__)
 
 app.secret_key = 'supersecretkey'  # Needed for flashing messages
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fencing.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fencing.db' #'sqlite:///maisch2025_02Feb.db' #
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
