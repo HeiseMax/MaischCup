@@ -37,7 +37,7 @@
 {% endblock %}
 
 <html>
-    <table>
+    <table id="score-table">
     <thead>
         <tr>
         <th>Name</th>
@@ -83,4 +83,63 @@
         {% endfor %}
     </tbody>
     </table>
+
+    <script>
+        function refreshTable() {
+            fetch('/get_scores')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#score-table tbody');
+                    tableBody.innerHTML = ''; // Clear the current table body
+                    const tableHead = document.querySelector('#score-table thead');
+                    tableHead.innerHTML = ''; // Clear the current table body
+
+                    data.players.forEach((player, i) => {
+                        const index = i + 1
+                        const row = document.createElement('tr');
+                        row.className = index % 2 === 0 ? 'even-row' : '';
+
+                        // Add player details
+                        row.innerHTML += `<td>${player.name}</td>`;
+                        row.innerHTML += `<td>${index}</td>`;
+
+                        // Add matchup results
+                        data.players.forEach(opponent => {
+                            if (player.id === opponent.id) {
+                                row.innerHTML += `<td class="dark-cell">---</td>`;
+                            } else {
+                                const score = data.scores.find(s => s.player1_id === player.id && s.player2_id === opponent.id);
+                                if (score) {
+                                    const resultClass = score.win ? 'win' : 'loss';
+                                    row.innerHTML += `<td class="${resultClass}">${score.win ? 'V' : 'D'}${score.score1}<br /></td>`;
+                                } else {
+                                    row.innerHTML += `<td>-</td>`;
+                                }
+                            }
+                        });
+
+                        // Add won, lost, and remaining matches
+                        row.innerHTML += `<td>${data.won_matches[player.id]}</td>`;
+                        row.innerHTML += `<td>${data.lost_matches[player.id]}</td>`;
+                        row.innerHTML += `<td>${data.remaining_matches[player.id]}</td>`;
+
+                        tableBody.appendChild(row);
+                    });
+                    const row = document.createElement('tr');
+                    row.innerHTML += `<th>${"Name"}</th>`;
+                    row.innerHTML += `<th>${"Nummer"}</th>`;
+                    data.players.forEach((player, i) => {
+                        row.innerHTML += `<th>${i + 1}</th>`;
+                    });
+                    row.innerHTML += `<th>${"Gewonnen"}</th>`;
+                    row.innerHTML += `<th>${"Verloren"}</th>`;
+                    row.innerHTML += `<th>${"Offen"}</th>`;
+                    tableHead.innerHTML = row.innerHTML; // Clear the current table body
+                })
+                .catch(error => console.error('Error fetching scores:', error));
+        }
+
+        // Refresh the table every 5 seconds
+        setInterval(refreshTable, 5000);
+    </script>
 </html>

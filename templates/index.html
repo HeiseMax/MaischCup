@@ -5,6 +5,11 @@
   button {
       font-size: larger;
   }
+  update-scores-form {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 25px;
+  }
 </style>
 {% endblock %}
 
@@ -15,14 +20,12 @@
   <!-- Score Table -->
   {% include 'components/score_table.html' %}
 
-  <!-- Add Player Form -->
-  <div class="add-player-form">
-    <form method="GET" action="/add_player">
-      <button type="submit">Teilnehmer hinzufügen</button>
+  <!-- Update Scores Form -->
+  <div class="update-scores-form">
+    <form method="GET" action="/update_score">
+    <button type="submit">Ergebnisse Eintragen</button>
     </form>
   </div>
 
-  <!-- Add Match Form -->
-  {% include 'components/add_match.html' %}  
 </div>
 {% endblock %}

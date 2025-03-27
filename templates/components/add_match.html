@@ -12,9 +12,20 @@
     }
     li{list-style:none;}
     .grayed-out {
-            color: rgba(128, 128, 128, 0.562);
-            background-color: rgba(128, 128, 128, 0.162);
-        }
+        color: rgba(128, 128, 128, 0.562);
+        background-color: rgba(128, 128, 128, 0.162);
+    }
+    button {
+        font-size: larger;
+    }
+    .add-player-form {
+        margin-top: 120px;
+        text-align: center;
+    }
+    .show-results-form {
+        margin-top: 40px;
+        text-align: center;
+    }
 </style>
 {% endblock %}
 
@@ -31,7 +42,7 @@
             <label for="player2_id">und</label>
             <select name="player2_id" id="player2_id">
                 {% for player in players %}
-                <option value="{{ player.id }}">{{ player.name }}</option>
+                <option value="{{ player.id }}">{{ loop.index }}{{player.name }}</option>
                 {% endfor %}
             </select>
             <label for="score1">geht</label>
@@ -58,6 +69,20 @@
             </ul>
             {% endif %} {% endwith %}
         </form>
+
+        <!-- Add Player Form -->
+        <div class="add-player-form">
+            <form method="GET" action="/add_player">
+            <button type="submit">Teilnehmer hinzufügen</button>
+            </form>
+        </div>
+
+        <!-- Show Results Form -->
+        <div class="show-results-form">
+            <form method="GET" action="/">
+            <button type="submit">Ergebniss Ansehen</button>
+            </form>
+        </div>
     </div>
 </html>
 
@@ -101,10 +126,11 @@
             const player1Id = parseInt(player1Select.value);
             player2Select.innerHTML = '';
 
-            playersjson.forEach(player => {
+            playersjson.forEach((player, i) => {
+                const index = i + 1;
                 const option = document.createElement('option');
                 option.value = player.id;
-                option.textContent = `${player.id}. ${player.name}`;
+                option.textContent = `${index}. ${player.name}`;
 
                 const existingScore = scoresjson.find(score => score.player1_id === player1Id && score.player2_id === player.id);
                 if (existingScore) {

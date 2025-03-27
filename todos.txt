@@ -11,3 +11,20 @@ extract results
 
 maintainability:
 nummerierung und playerID consistant machen/löschen
+
+
+speichern der zweiten auswahl beim Eintragen?
+
+
+
+  <!-- Add Player Form -->
+  <!-- <div class="add-player-form">
+    <form method="GET" action="/add_player">
+      <button type="submit">Teilnehmer hinzufügen</button>
+    </form>
+  </div> -->
+
+  <!-- Add Match Form -->
+  <!-- {% include 'components/add_match.html' %}   -->
+
+  ?????

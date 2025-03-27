@@ -72,7 +72,7 @@ def add_player():
             db.session.add(new_player)
             db.session.commit()
             session['player_id'] = new_player.id
-            return redirect(url_for('index'))
+            return redirect(url_for('add_player'))
         return redirect(url_for('add_player'))
 
 # Route to handle score updates
@@ -110,10 +110,27 @@ def update_score():
                         db.session.add(new_score)
                         db.session.add(new_score_rev)
                     db.session.commit()
-                return redirect(url_for('index'))
+                return redirect(request.referrer)
         
         flash('Ergebnis nicht zulässig. Einer der beiden Punktestände muss 5 sein.')
-        return redirect(url_for('index'))
+        return redirect(request.referrer)
+    
+@app.route('/get_scores', methods=['GET'])
+def get_scores():
+    players = Player.query.all()
+    scores = Score.query.all()
+    won_matches = {player.id: calculate_won_matches(player.id) for player in players}
+    lost_matches = {player.id: calculate_lost_matches(player.id) for player in players}
+    remaining_matches = {player.id: calculate_remaining_matches(player.id) for player in players}
+
+    data = {
+        "players": [{"id": player.id, "name": player.name} for player in players],
+        "scores": [{"player1_id": score.player1_id, "player2_id": score.player2_id, "score1": score.score1, "score2": score.score2, "win": score.win} for score in scores],
+        "won_matches": won_matches,
+        "lost_matches": lost_matches,
+        "remaining_matches": remaining_matches
+    }
+    return data
     
 @app.route('/dev', methods=['GET', 'POST'])
 def dev():
