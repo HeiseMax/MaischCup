@@ -2,29 +2,19 @@ TODOS:
 
 increase tooltip font size (needs custom css tooltip)
 mobile layout design
+rename login
 
 
 future features:
 verbleibende matches page
 Turnierkonfiguration (name der datenbank, neues Turnier, etc.)
 extract results
+add points, received hits, index, placement
 
 maintainability:
-nummerierung und playerID consistant machen/löschen
+nummerierung und playerID consistant machen/löschen (ID durch random id ersetzen?)
+save matches in one direction only
+remove default render of table, only use the js injection
 
 
 speichern der zweiten auswahl beim Eintragen?
-
-
-
-  <!-- Add Player Form -->
-  <!-- <div class="add-player-form">
-    <form method="GET" action="/add_player">
-      <button type="submit">Teilnehmer hinzufügen</button>
-    </form>
-  </div> -->
-
-  <!-- Add Match Form -->
-  <!-- {% include 'components/add_match.html' %}   -->
-
-  ?????
