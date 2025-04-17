@@ -3,6 +3,8 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 import json
 
+from helper import calculate_won_matches, calculate_lost_matches, calculate_remaining_matches, calculate_fraction_of_wins, calculate_total_points, calculate_total_points_received, calculate_point_difference
+
 app = Flask(__name__)
 
 app.secret_key = 'supersecretkey'  # Needed for flashing messages
@@ -32,26 +34,14 @@ class Score(db.Model):
     player1 = db.relationship('Player', foreign_keys=[player1_id])
     player2 = db.relationship('Player', foreign_keys=[player2_id])
 
-# Function to calculate won matches
-def calculate_won_matches(player_id):
-    return Score.query.filter_by(player1_id=player_id, win=True).count()
-
-# Function to calculate lost matches
-def calculate_lost_matches(player_id):
-    return Score.query.filter_by(player1_id=player_id, win=False).count()
-
-# Function to calculate remaining matches
-def calculate_remaining_matches(player_id):
-    return Player.query.count() - 1 - Score.query.filter_by(player1_id=player_id).count()
-
 # Home route
 @app.route('/')
 def index():
     players = Player.query.all()
     scores = Score.query.all()
-    won_matches = {player.id: calculate_won_matches(player.id) for player in players}
-    lost_matches = {player.id: calculate_lost_matches(player.id) for player in players}
-    remaining_matches = {player.id: calculate_remaining_matches(player.id) for player in players}
+    won_matches = {player.id: calculate_won_matches(Score, player.id) for player in players}
+    lost_matches = {player.id: calculate_lost_matches(Score, player.id) for player in players}
+    remaining_matches = {player.id: calculate_remaining_matches(Score, Player, player.id) for player in players}
     playersjson = json.dumps([{"id": player.id, "name": player.name} for player in players])
     scoresjson = json.dumps([{"player1_id": score.__dict__["player1_id"], "player2_id": score.__dict__["player2_id"]} for score in scores])
     return render_template('index.html', players=players, scores=scores, won_matches=won_matches, lost_matches=lost_matches, remaining_matches=remaining_matches, playersjson=playersjson, scoresjson=scoresjson)
@@ -60,7 +50,7 @@ def index():
 @app.route('/add_player', methods=['POST', 'GET'])
 def add_player():
     if request.method == 'GET':
-        return render_template('login.html')
+        return render_template('add_player.html')
     
     if request.method == 'POST':
         new_name = request.form['name']
@@ -100,10 +90,15 @@ def update_score():
                 if player1_id != player2_id:
                     win = score1 > score2
                     score = Score.query.filter_by(player1_id=player1_id, player2_id=player2_id).first()
+                    score_rev = Score.query.filter_by(player1_id=player2_id, player2_id=player1_id).first()
                     if score:
                         score.score1 = score1
                         score.score2 = score2
                         score.win = win
+                    if score_rev:
+                        score_rev.score1 = score2
+                        score_rev.score2 = score1
+                        score_rev.win = not win
                     else:
                         new_score = Score(player1_id=player1_id, player2_id=player2_id, score1=score1, score2=score2, win=win)
                         new_score_rev = Score(player1_id=player2_id, player2_id=player1_id, score1=score2, score2=score1, win=not win)
@@ -119,9 +114,9 @@ def update_score():
 def get_scores():
     players = Player.query.all()
     scores = Score.query.all()
-    won_matches = {player.id: calculate_won_matches(player.id) for player in players}
-    lost_matches = {player.id: calculate_lost_matches(player.id) for player in players}
-    remaining_matches = {player.id: calculate_remaining_matches(player.id) for player in players}
+    won_matches = {player.id: calculate_won_matches(Score, player.id) for player in players}
+    lost_matches = {player.id: calculate_lost_matches(Score, player.id) for player in players}
+    remaining_matches = {player.id: calculate_remaining_matches(Score, Player, player.id) for player in players}
 
     data = {
         "players": [{"id": player.id, "name": player.name} for player in players],

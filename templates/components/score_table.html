@@ -38,50 +38,10 @@
 
 <html>
     <table id="score-table">
-    <thead>
-        <tr>
-        <th>Name</th>
-        <th>Nummer</th>
-        {% for player in players %}
-        <th title="{{ player.name }}">{{ loop.index }}</th>
-        {% endfor %}
-        <th>Gewonnen</th>
-        <th>Verloren</th>
-        <th>Offen</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for player in players %}
-        <tr class="{% if loop.index is even %}even-row{% endif %}">
-        <!-- Player Details -->
-        <td>{{ player.name }}</td>
-        <td>{{ loop.index }}</td>
-
-        <!-- Matchup Results -->
-        {% for opponent in players %}
-        <!-- Black cell for same player -->
-        {% if player.id == opponent.id %}
-        <td class="dark-cell">---</td>
-        {% else %} {% set score = scores|selectattr('player1_id', 'equalto',
-        player.id)|selectattr('player2_id', 'equalto', opponent.id)|first %}
-        <td
-            class="{% if score %} {% if score.win %}win{% else %}loss{% endif %}{% endif %}"
-            title="{{ opponent.name }}"
-        >
-            {% if score %} {% if score.win %} V{{ score.score1 }}<br />
-            {% else %} D{{ score.score1 }}<br /> {% endif %} {% else %} - {% endif %}
-            <!-- Show score in both directions 
-            {% if score %} {% if score.win %} V{{ score.score1 }}<br />-<br />D{{
-            score.score2 }} {% else %} D{{ score.score1 }}<br />-<br />V{{
-            score.score2 }} {% endif %} {% else %} - {% endif %} -->
-        </td>
-        {% endif %} {% endfor %}
-        <td>{{ won_matches[player.id] }}</td>
-        <td>{{ lost_matches[player.id] }}</td>
-        <td>{{ remaining_matches[player.id] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+        <thead>
+        </thead>
+        <tbody>
+        </tbody>
     </table>
 
     <script>
@@ -89,10 +49,10 @@
             fetch('/get_scores')
                 .then(response => response.json())
                 .then(data => {
-                    const tableBody = document.querySelector('#score-table tbody');
-                    tableBody.innerHTML = ''; // Clear the current table body
                     const tableHead = document.querySelector('#score-table thead');
                     tableHead.innerHTML = ''; // Clear the current table body
+                    const tableBody = document.querySelector('#score-table tbody');
+                    tableBody.innerHTML = ''; // Clear the current table body                    
 
                     data.players.forEach((player, i) => {
                         const index = i + 1
@@ -139,7 +99,12 @@
                 .catch(error => console.error('Error fetching scores:', error));
         }
 
-        // Refresh the table every 5 seconds
-        setInterval(refreshTable, 5000);
+        // Initial call to populate the table
+        window.onload = function() {
+            refreshTable(); 
+        };
+
+        // Refresh the table every 3 seconds
+        setInterval(refreshTable, 3000);
     </script>
 </html>
