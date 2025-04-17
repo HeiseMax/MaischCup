@@ -4,6 +4,13 @@
 
 {% block content %}
 <div class="container">
+    <h2>Stat Visibility</h2>
+    <form method="POST" action="{{ url_for('dev') }}">
+        {% for stat in stats.keys() %}
+        <label><input type="checkbox" name={{stat}} {% if stats[stat] %}checked{% endif %}> {{ stat }}</label><br>
+        {% endfor %}
+        <button type="submit">Save Preferences</button>
+    </form>
     <h2>Players</h2>
     <ul>
         {% for player in players %}

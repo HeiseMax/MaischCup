@@ -3,7 +3,7 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 import json
 
-from helper import calculate_won_matches, calculate_lost_matches, calculate_remaining_matches, calculate_fraction_of_wins, calculate_total_points, calculate_total_points_received, calculate_point_difference
+from helper import calculate_won_matches, calculate_lost_matches, calculate_remaining_matches, calculate_fraction_of_wins, calculate_total_points, calculate_total_points_received, calculate_point_difference, calculate_ranking
 
 app = Flask(__name__)
 
@@ -34,17 +34,24 @@ class Score(db.Model):
     player1 = db.relationship('Player', foreign_keys=[player1_id])
     player2 = db.relationship('Player', foreign_keys=[player2_id])
 
+@app.before_request
+def set_default_session_values():
+    if 'stats' not in session:
+        session['stats'] = {
+            "won": True,
+            "lost": True,
+            "remaining": True,
+            "fraction": False,
+            "points": False,
+            "points_received": False,
+            "index": False,
+            "rank": False
+        }
+
 # Home route
 @app.route('/')
 def index():
-    players = Player.query.all()
-    scores = Score.query.all()
-    won_matches = {player.id: calculate_won_matches(Score, player.id) for player in players}
-    lost_matches = {player.id: calculate_lost_matches(Score, player.id) for player in players}
-    remaining_matches = {player.id: calculate_remaining_matches(Score, Player, player.id) for player in players}
-    playersjson = json.dumps([{"id": player.id, "name": player.name} for player in players])
-    scoresjson = json.dumps([{"player1_id": score.__dict__["player1_id"], "player2_id": score.__dict__["player2_id"]} for score in scores])
-    return render_template('index.html', players=players, scores=scores, won_matches=won_matches, lost_matches=lost_matches, remaining_matches=remaining_matches, playersjson=playersjson, scoresjson=scoresjson)
+    return render_template('index.html')
 
 # Route to handle adding a new player
 @app.route('/add_player', methods=['POST', 'GET'])
@@ -117,21 +124,53 @@ def get_scores():
     won_matches = {player.id: calculate_won_matches(Score, player.id) for player in players}
     lost_matches = {player.id: calculate_lost_matches(Score, player.id) for player in players}
     remaining_matches = {player.id: calculate_remaining_matches(Score, Player, player.id) for player in players}
-
+    win_fraction = {player.id: calculate_fraction_of_wins(Score, player.id) for player in players}
+    points = {player.id: calculate_total_points(db, Score, player.id) for player in players}
+    points_received = {player.id: calculate_total_points_received(db, Score, player.id) for player in players}
+    point_difference = {player.id: calculate_point_difference(db, Score, player.id) for player in players}
+    ranking = calculate_ranking(db, Player, Score)
+    rank_mapping = {player["id"]: rank + 1 for rank, player in enumerate(ranking)}
+    
     data = {
         "players": [{"id": player.id, "name": player.name} for player in players],
         "scores": [{"player1_id": score.player1_id, "player2_id": score.player2_id, "score1": score.score1, "score2": score.score2, "win": score.win} for score in scores],
-        "won_matches": won_matches,
-        "lost_matches": lost_matches,
-        "remaining_matches": remaining_matches
+        "stats" : [
+            {"id": "won", "name": "Gewonnen", "value": won_matches, "show": False},
+            {"id": "lost", "name": "Verloren", "value": lost_matches, "show": False},
+            {"id": "remaining", "name": "Offen", "value": remaining_matches, "show": False},
+            {"id": "fraction", "name": "Sieganteil", "value": win_fraction, "show": False},
+            {"id": "points", "name": "Punkte", "value": points, "show": False},
+            {"id": "points_received", "name": "Punkte erhalten", "value": points_received, "show": False},
+            {"id": "index", "name": "Index", "value": point_difference, "show": False},
+            {"id": "rank", "name": "Rang", "value": rank_mapping, "show": False}
+        ]
     }
+    for stat in data["stats"]:
+        if session["stats"][stat["id"]]:
+            stat["show"] = True
+
     return data
     
 @app.route('/dev', methods=['GET', 'POST'])
 def dev():
+    if request.method == 'POST':
+        # Update session stats based on form submission
+        session['stats'] = {
+            "won": 'won' in request.form,
+            "lost": 'lost' in request.form,
+            "remaining": 'remaining' in request.form,
+            "fraction": 'fraction' in request.form,
+            "points": 'points' in request.form,
+            "points_received": 'points_received' in request.form,
+            "index": 'index' in request.form,
+            "rank": 'rank' in request.form,
+        }
+        return redirect(url_for('dev'))
+    
     players = Player.query.all()
     scores = Score.query.all()
-    return render_template('dev.html', players=players, scores=scores)
+    stats=session['stats']
+    return render_template('dev.html', players=players, scores=scores, stats=stats)
     
 # Route to remove a player
 @app.route('/remove_player/<int:player_id>', methods=['POST'])

@@ -4,11 +4,12 @@ increase tooltip font size (needs custom css tooltip)
 mobile layout design
 add remaining css to styles.css
 refreshtime as parameter
+make shown stats and stat names consistent between what exists, is calculated and can be selected
 
 
 future features:
 verbleibende matches page
-Turnierkonfiguration (name der datenbank, neues Turnier, etc.)
+Turnierkonfiguration (name der datenbank, neues Turnier, etc.), Übersicht über alle vergangenen Tableaus
 extract results
 add points, received hits, index, placement
 executable file, create qr code, python script for database
