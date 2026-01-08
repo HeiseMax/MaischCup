@@ -13,6 +13,7 @@ Turnierkonfiguration (name der datenbank, neues Turnier, etc.), Übersicht über
 extract results
 add points, received hits, index, placement
 executable file, create qr code, python script for database
+Rangliste
 
 maintainability:
 nummerierung und playerID consistant machen
@@ -20,3 +21,21 @@ nummerierung und playerID consistant machen
 save matches in one direction only (Im Moment würde ich es so lassen)
 
 speichern der zweiten auswahl beim Eintragen?
+
+
+
+
+Rework for training:
+Easy training creation:
+    create groups (each 1 database) doch besser eine DB
+    when selected pass turnament id in url
+    select right DB via binds
+    every function needs to use tounament id as param
+    each group is one pool
+        create multiple pools for groups
+        evaluate pools withing group
+
+Turniere Archivieren, nicht löschen
+
+
+alternative version: one database that has keys: tounaments, players and matches

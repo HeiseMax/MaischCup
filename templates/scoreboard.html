@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+  button {
+      font-size: larger;
+  }
+  .update-scores-form {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 25px;
+  }
+</style>
+{% endblock %}
+
+{% block title %}Fencing Score Sheet{% endblock %}
+
+{% block content %}
+<div>
+  <!-- Score Table -->
+  {% include 'components/score_table.html' %}
+
+  <!-- Update Scores Form -->
+  <div class="update-scores-form">
+    <form method="GET" action="/update_score">
+    <button type="submit">Ergebnisse Eintragen</button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

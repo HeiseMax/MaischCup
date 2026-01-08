@@ -19,3 +19,7 @@ flask run --host=0.0.0.0
 
 for debug mode:
 --debug
+
+
+create app: (creates app, but db does not work, doesnt create window to use or close, use pywebview)
+pyinstaller -w -F --add-data "templates;templates" --add-data "static;static" app.py

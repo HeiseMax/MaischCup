@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import json
-from models import db, Player, Score
+from models import db, Player, Score, Tournament
 from helper import (calculate_won_matches, calculate_lost_matches, 
                     calculate_remaining_matches, calculate_fraction_of_wins, 
                     calculate_total_points, calculate_total_points_received, 
@@ -24,7 +24,12 @@ def set_default_session_values():
 
 @bp.route('/')
 def index():
-    return render_template('index.html')
+    tournaments = Tournament.query.all()
+    return render_template('index.html', tournaments=tournaments)
+
+@bp.route('/scoreboard', methods=['GET'])
+def scoreboard():
+    return render_template('scoreboard.html')
 
 @bp.route('/add_player', methods=['POST', 'GET'])
 def add_player():
@@ -37,7 +42,8 @@ def add_player():
             session['player_id'] = Player.query.filter_by(name=new_name).first().id
             flash('Name schon eingetragen. Entweder du bist schon eingetragen, oder dein Namensvetter war schneller.')
         else:
-            new_player = Player(name=new_name)
+            tournament_id = session.get('tournament_id')
+            new_player = Player(name=new_name, tournament_id=tournament_id)
             db.session.add(new_player)
             db.session.commit()
             session['player_id'] = new_player.id
@@ -176,4 +182,38 @@ def remove_match(player1_id, player2_id):
         flash('Match removed successfully.')
     else:
         flash('Match not found.')
+    return redirect(url_for('main.index'))
+
+@bp.route('/create_tournament', methods=['POST'])
+def create_tournament():
+    tournament_name = request.form['tournament_name']
+    if tournament_name.strip():
+        new_tournament = Tournament(name=tournament_name)
+        db.session.add(new_tournament)
+        db.session.commit()
+        session['tournament_id'] = new_tournament.id
+        flash(f'Tournament "{tournament_name}" created successfully!')
+    else:
+        flash('Tournament name cannot be empty.')
+    return redirect(url_for('main.index'))
+
+@bp.route('/select_tournament/<int:tournament_id>', methods=['POST'])
+def select_tournament(tournament_id):
+    tournament = Tournament.query.get(tournament_id)
+    if tournament:
+        session['tournament_id'] = tournament_id
+        return redirect(url_for('main.scoreboard'))
+    else:
+        flash('Tournament not found.')
+    return redirect(url_for('main.index'))
+
+@bp.route('/delete_tournament/<int:tournament_id>', methods=['POST'])
+def delete_tournament(tournament_id):
+    tournament = Tournament.query.get(tournament_id)
+    if tournament:
+        db.session.delete(tournament)
+        db.session.commit()
+        flash(f'Tournament "{tournament.name}" deleted successfully.')
+    else:
+        flash('Tournament not found.')
     return redirect(url_for('main.index'))
